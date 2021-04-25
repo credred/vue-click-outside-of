@@ -1,23 +1,65 @@
-import { unref } from "vue";
-import { ClickOutsideHandler, ClickOutsideOption } from ".";
+import {
+  getRealTargetFromComponentInternalInstance,
+  isComponentInternalInstance,
+  isComponentPublicInstance,
+  NOOP,
+} from "./lib";
+import {
+  ComponentInternalInstance,
+  ComponentPublicInstance,
+  Ref,
+  unref,
+} from "vue";
+import { ClickOutsideOption } from ".";
 import { addClickListener, EventMap } from "./lib/addClickListener";
 
-function getInsideDOMs(inside: ClickOutsideOption["inside"]) {
-  inside = unref(inside);
-  if (!inside) return [];
-  if (!Array.isArray(inside)) {
-    inside = [inside];
+export type ClickOutsideHandler<
+  T extends keyof EventMap = "downUp"
+> = EventMap[T];
+
+type ClickOutsideRawTarget =
+  | Element
+  | ComponentPublicInstance
+  | (Element | ComponentPublicInstance)[];
+
+export type ClickOutsideTarget =
+  | ClickOutsideRawTarget
+  | Ref<ClickOutsideRawTarget | undefined>
+  | ComponentInternalInstance;
+
+function getRealTarget(target: ClickOutsideTarget) {
+  let newTarget:
+    | ClickOutsideRawTarget
+    | ComponentInternalInstance
+    | undefined = unref(target);
+
+  if (newTarget === undefined) {
+    newTarget = [];
+  } else if (isComponentInternalInstance(newTarget)) {
+    newTarget = getRealTargetFromComponentInternalInstance(newTarget);
   }
-  return inside.filter(Boolean).map(unref) as Element[];
+  if (!Array.isArray(newTarget)) {
+    newTarget = [newTarget];
+  }
+  return newTarget
+    .map((t) =>
+      isComponentPublicInstance(t)
+        ? getRealTargetFromComponentInternalInstance(t.$)
+        : t
+    )
+    .flat();
 }
 
-export function createClickHandler<T extends keyof EventMap = "downUp">(
-  target: Element | Element[] | undefined,
+export function listenClickOutside<T extends keyof EventMap = "downUp">(
+  target: ClickOutsideTarget,
   cb: ClickOutsideHandler<T>,
   option: ClickOutsideOption<T>
-): ReturnType<typeof addClickListener> {
-  const targetArr =
-    (Array.isArray(target) && target) || (target && [target]) || [];
+): () => void {
+  const realTarget = getRealTarget(target);
+  const excludeTarget = option.exclude ? getRealTarget(option.exclude) : [];
+  if (realTarget.length === 0) {
+    return NOOP;
+  }
 
   return addClickListener(
     option.type || "downUp",
@@ -25,8 +67,8 @@ export function createClickHandler<T extends keyof EventMap = "downUp">(
       mousedownEvOrClickEv: MouseEvent,
       mouseupEv?: MouseEvent
     ) {
-      const mousedownEvTarget = mousedownEvOrClickEv.target as Element;
-      const mouseupEvTarget =
+      const mousedownEvOrClickTarget = mousedownEvOrClickEv.target as Element;
+      const mouseupEvTargetOrNull =
         // the reason of disable no-non-null-assertion:  mouseupEv type must be MouseEvent if option.type is 'downUp'
         // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
         option.type === "downUp" ? (mouseupEv!.target as Element) : null;
@@ -36,17 +78,14 @@ export function createClickHandler<T extends keyof EventMap = "downUp">(
             ([mousedownEvOrClickEv, mouseupEv!] as const)
           : ([mousedownEvOrClickEv] as const);
       if (
-        targetArr.some(
-          (el) => el.contains(mousedownEvTarget) || el.contains(mouseupEvTarget)
-        ) ||
-        getInsideDOMs(option.inside).some(
-          (insideDOM) =>
-            insideDOM.contains(mousedownEvTarget) ||
-            insideDOM.contains(mouseupEvTarget)
+        [...realTarget, ...excludeTarget].some(
+          (el) =>
+            el.contains(mousedownEvOrClickTarget) ||
+            el.contains(mouseupEvTargetOrNull)
         ) ||
         // the reason of disable @typescript-eslint/no-explicit-any:  ts can't recognize right typing
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        (option.isOutside && !option.isOutside(...(cbArgs as any)))
+        (option.before && !option.before(...(cbArgs as any)))
       ) {
         return;
       }

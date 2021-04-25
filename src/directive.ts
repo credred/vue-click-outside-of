@@ -1,6 +1,6 @@
 import { ObjectDirective } from "vue";
-import { ClickOutsideHandler, ClickOutsideOption } from ".";
-import { createClickHandler } from "./core";
+import { ClickOutsideOption } from ".";
+import { ClickOutsideHandler, listenClickOutside } from "./core";
 
 export interface VClickOutsideObjectValue extends ClickOutsideOption {
   handler: ClickOutsideHandler;
@@ -54,8 +54,8 @@ const vClickOutside: VClickOutside = {
         ? value
         : (value as VClickOutsideObjectValue).handler;
 
-    const removeClickListenerHandler = createClickHandler(el, cb, value);
-    removeClickListenerMap.set(el, removeClickListenerHandler);
+    const stopClickOutsideListener = listenClickOutside(el, cb, value);
+    removeClickListenerMap.set(el, stopClickOutsideListener);
   },
   updated(el, { value }) {
     const cb =
@@ -63,16 +63,16 @@ const vClickOutside: VClickOutside = {
         ? value
         : (value as VClickOutsideObjectValue).handler;
 
-    let removeClickListenerHandler = removeClickListenerMap.get(el);
-    removeClickListenerHandler?.();
+    let stopClickOutsideListener = removeClickListenerMap.get(el);
+    stopClickOutsideListener?.();
 
-    removeClickListenerHandler = createClickHandler(el, cb, value);
-    removeClickListenerMap.set(el, removeClickListenerHandler);
+    stopClickOutsideListener = listenClickOutside(el, cb, value);
+    removeClickListenerMap.set(el, stopClickOutsideListener);
   },
   unmounted(el) {
     // When el are unmounted all of the clickListener which register on it need to be removed.
-    const removeClickListenerHandler = removeClickListenerMap.get(el);
-    removeClickListenerHandler?.();
+    const stopClickOutsideListener = removeClickListenerMap.get(el);
+    stopClickOutsideListener?.();
     removeClickListenerMap.delete(el);
   },
 };
