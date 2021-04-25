@@ -17,8 +17,7 @@ export function isComponentPublicInstance(
 ): instance is ComponentPublicInstance {
   return (
     !!instance &&
-    (instance as ComponentPublicInstance).$ &&
-    isVNode((instance as ComponentPublicInstance).$.vnode)
+    isComponentInternalInstance((instance as ComponentPublicInstance).$)
   );
 }
 
