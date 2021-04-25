@@ -15,7 +15,11 @@ export function isComponentInternalInstance(
 export function isComponentPublicInstance(
   instance: unknown
 ): instance is ComponentPublicInstance {
-  return !!instance && isVNode((instance as ComponentPublicInstance).$.vnode);
+  return (
+    !!instance &&
+    (instance as ComponentPublicInstance).$ &&
+    isVNode((instance as ComponentPublicInstance).$.vnode)
+  );
 }
 
 export function getRealTargetFromComponentInternalInstance(
