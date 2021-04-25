@@ -1,5 +1,6 @@
 export interface EventMap {
-  downUp: (mousedownEv: MouseEvent, mouseupEv: MouseEvent) => void;
+  // mousedownEv was undefined if user already pressed mouse before register click outside handler
+  downUp: (mousedownEv: MouseEvent | undefined, mouseupEv: MouseEvent) => void;
   click: (ev: MouseEvent) => void;
   dblclick: (ev: MouseEvent) => void;
 }

@@ -64,10 +64,12 @@ export function listenClickOutside<T extends keyof EventMap = "downUp">(
   return addClickListener(
     option.type || "downUp",
     function clickListener(
-      mousedownEvOrClickEv: MouseEvent,
+      mousedownEvOrClickEv: MouseEvent | undefined,
       mouseupEv?: MouseEvent
     ) {
-      const mousedownEvOrClickTarget = mousedownEvOrClickEv.target as Element;
+      const mousedownEvOrClickTarget = mousedownEvOrClickEv
+        ? (mousedownEvOrClickEv.target as Element)
+        : null;
       const mouseupEvTargetOrNull =
         // the reason of disable no-non-null-assertion:  mouseupEv type must be MouseEvent if option.type is 'downUp'
         // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
@@ -76,7 +78,8 @@ export function listenClickOutside<T extends keyof EventMap = "downUp">(
         option.type === "downUp"
           ? // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
             ([mousedownEvOrClickEv, mouseupEv!] as const)
-          : ([mousedownEvOrClickEv] as const);
+          : // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+            ([mousedownEvOrClickEv!] as const);
       if (
         [...realTarget, ...excludeTarget].some(
           (el) =>
