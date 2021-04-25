@@ -25,9 +25,13 @@ export function getRealTargetFromComponentInternalInstance(
   target: ComponentInternalInstance
 ): Element | Element[] {
   if (target.subTree.type === Fragment) {
-    return (target.subTree.children as VNode[]).map(
-      (vnode) => vnode.el as Element
-    );
+    return (target.subTree.children as VNode[])
+      .map((vnode) =>
+        vnode.component
+          ? getRealTargetFromComponentInternalInstance(vnode.component)
+          : (vnode.el as Element)
+      )
+      .flat();
   } else {
     return target.subTree.el as Element;
   }
