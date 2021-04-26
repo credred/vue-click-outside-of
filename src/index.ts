@@ -1,5 +1,5 @@
 import { App } from "vue";
-import { EventMap } from "./lib/addClickListener";
+import { Button, EventMap } from "./lib/addClickListener";
 import vClickOutside from "./directive";
 import { ClickOutsideTarget } from "./core";
 
@@ -18,6 +18,13 @@ export interface ClickOutsideOption<T extends keyof EventMap = "downUp"> {
    * You can use *exclude* option also if you want to exclude some element only.
    */
   before?: (...args: Parameters<EventMap[T]>) => boolean;
+  /**
+   * indicates which button was pressed on the mouse to trigger the click outside handler
+   *
+   * not support "dblclick" type
+   * @default "all"
+   */
+  button?: Button;
 }
 
 function install(app: App): void {

@@ -56,6 +56,7 @@ export function listenClickOutside<T extends keyof EventMap = "downUp">(
   option: ClickOutsideOption<T>
 ): () => void {
   const type = option.type || "downUp";
+  const button = option.button || "all";
   const realTarget = getRealTarget(target);
   const excludeTarget = option.exclude ? getRealTarget(option.exclude) : [];
   if (realTarget.length === 0) {
@@ -95,6 +96,7 @@ export function listenClickOutside<T extends keyof EventMap = "downUp">(
       }
       // the reason of using 'as' statement: ts can't recognize the right typing of cb paramter
       cb(...(cbArgs as [MouseEvent, MouseEvent]));
-    }
+    },
+    button
   );
 }
