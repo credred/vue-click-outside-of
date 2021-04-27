@@ -1,5 +1,3 @@
-import { ClickOutsideOption } from "src";
-
 export interface EventMap {
   // mousedownEv was undefined if user already pressed mouse before register click outside handler
   downUp: (mousedownEv: MouseEvent | undefined, mouseupEv: MouseEvent) => void;

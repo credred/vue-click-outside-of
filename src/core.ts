@@ -1,5 +1,5 @@
 import {
-  getRealTargetFromComponentInternalInstance,
+  getRealTargetFromVNode,
   isComponentInternalInstance,
   isComponentPublicInstance,
   NOOP,
@@ -27,25 +27,24 @@ export type ClickOutsideTarget =
   | Ref<ClickOutsideRawTarget | undefined>
   | ComponentInternalInstance;
 
-function getRealTarget(target: ClickOutsideTarget) {
+function getRealTarget(target: ClickOutsideTarget): Element[] {
   let newTarget:
     | ClickOutsideRawTarget
     | ComponentInternalInstance
     | undefined = unref(target);
 
   if (newTarget === undefined) {
-    newTarget = [];
+    return [];
   } else if (isComponentInternalInstance(newTarget)) {
-    newTarget = getRealTargetFromComponentInternalInstance(newTarget);
+    const realTarget = getRealTargetFromVNode(newTarget.subTree);
+    return Array.isArray(realTarget) ? realTarget : [realTarget];
   }
   if (!Array.isArray(newTarget)) {
     newTarget = [newTarget];
   }
   return newTarget
     .map((t) =>
-      isComponentPublicInstance(t)
-        ? getRealTargetFromComponentInternalInstance(t.$)
-        : t
+      isComponentPublicInstance(t) ? getRealTargetFromVNode(t.$.subTree) : t
     )
     .flat();
 }

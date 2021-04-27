@@ -1,11 +1,10 @@
 import {
   ComponentInternalInstance,
   ComponentPublicInstance,
-  Fragment,
   isVNode,
   VNode,
 } from "@vue/runtime-core";
-
+import { ShapeFlags } from "./shapeFlags";
 export function isComponentInternalInstance(
   instance: unknown
 ): instance is ComponentInternalInstance {
@@ -21,18 +20,17 @@ export function isComponentPublicInstance(
   );
 }
 
-export function getRealTargetFromComponentInternalInstance(
-  target: ComponentInternalInstance
-): Element | Element[] {
-  if (target.subTree.type === Fragment) {
-    return (target.subTree.children as VNode[])
-      .map((vnode) =>
-        vnode.component
-          ? getRealTargetFromComponentInternalInstance(vnode.component)
-          : (vnode.el as Element)
-      )
+export function getRealTargetFromVNode(target: VNode): Element | Element[] {
+  if (target.shapeFlag & ShapeFlags.ARRAY_CHILDREN) {
+    return (target.children as VNode[])
+      .map((vnode) => getRealTargetFromVNode(vnode))
       .flat();
+  } else if (target.shapeFlag & ShapeFlags.COMPONENT) {
+    return getRealTargetFromVNode(
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+      (target.component as ComponentInternalInstance).subTree
+    );
   } else {
-    return target.subTree.el as Element;
+    return target.el as Element;
   }
 }
