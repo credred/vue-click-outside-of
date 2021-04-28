@@ -1,3 +1,4 @@
+import { EventMap } from "./lib/addClickListener";
 import { getCurrentInstance, watchEffect } from "vue";
 import { ClickOutsideOption } from ".";
 import {
@@ -8,10 +9,10 @@ import {
 
 export type ClickOutsideStopHandler = () => void;
 
-export function onClickOutside(
-  handler: ClickOutsideHandler,
+export function onClickOutside<T extends keyof EventMap>(
+  handler: ClickOutsideHandler<T>,
   target?: ClickOutsideTarget,
-  option: ClickOutsideOption = {}
+  option: ClickOutsideOption<T> = {}
 ): ClickOutsideStopHandler {
   let newTarget: ClickOutsideTarget;
   if (target === undefined) {
@@ -19,7 +20,7 @@ export function onClickOutside(
     if (currentInstance === null) {
       throw new TypeError(
         "onClickOutside hook is called when there is no active component instance to be associated with." +
-          "It can only be used during execution of setup() When onClickOutside hook's 'target' argument are undefined"
+          "It can only be used during execution of setup() when onClickOutside hook's 'target' argument are undefined"
       );
     }
     newTarget = currentInstance;

@@ -1,34 +1,53 @@
+import { EventMap } from "src/lib/addClickListener";
 import { ObjectDirective } from "vue";
 import { ClickOutsideOption } from ".";
 import { ClickOutsideHandler, listenClickOutside } from "./core";
 
-export interface VClickOutsideObjectValue extends ClickOutsideOption {
-  handler: ClickOutsideHandler;
+export interface VClickOutsideObjectValue<K extends keyof EventMap>
+  extends ClickOutsideOption<K> {
+  handler: ClickOutsideHandler<K>;
 }
 
-export type VClickOutsideFunctionValue = ClickOutsideOption &
-  ClickOutsideHandler;
+export type VClickOutsideFunctionValue<
+  K extends keyof EventMap
+> = ClickOutsideOption<K> & ClickOutsideHandler<K>;
 
-export type VClickOutsideValue =
-  | VClickOutsideObjectValue
-  | VClickOutsideFunctionValue;
+export type VClickOutsideValue<K extends keyof EventMap> =
+  | VClickOutsideObjectValue<K>
+  | VClickOutsideFunctionValue<K>;
 
-// Type helper to make it easier to define directive value.
-export function defineVClickOutsideValue<T extends VClickOutsideValue>(
-  value: T
-): T extends VClickOutsideFunctionValue
-  ? VClickOutsideFunctionValue
-  : VClickOutsideObjectValue {
-  return value as never;
+// overload 1
+export function defineVClickOutsideValue<T extends keyof EventMap = "downUp">(
+  value: VClickOutsideObjectValue<T>
+): VClickOutsideObjectValue<T>;
+// overload 2
+export function defineVClickOutsideValue<T extends keyof EventMap = "downUp">(
+  value: VClickOutsideFunctionValue<T>,
+  option?: ClickOutsideOption<T>
+): VClickOutsideFunctionValue<T>;
+// implementation
+/** Type helper to make it easier to define directive value. */
+export function defineVClickOutsideValue<T extends keyof EventMap>(
+  value: VClickOutsideValue<T>,
+  option?: ClickOutsideOption<T>
+): VClickOutsideFunctionValue<T> | VClickOutsideObjectValue<T> {
+  if (typeof value === "function") {
+    Object.assign(value, option);
+  }
+  return value;
 }
 
 const removeClickListenerMap = new Map<Element, () => void>();
 
-export interface VClickOutside {
-  mounted: NonNullable<ObjectDirective<Element, VClickOutsideValue>["mounted"]>;
-  updated: NonNullable<ObjectDirective<Element, VClickOutsideValue>["updated"]>;
+export interface VClickOutside<K extends keyof EventMap = "downUp"> {
+  mounted: NonNullable<
+    ObjectDirective<Element, VClickOutsideValue<K>>["mounted"]
+  >;
+  updated: NonNullable<
+    ObjectDirective<Element, VClickOutsideValue<K>>["updated"]
+  >;
   unmounted: NonNullable<
-    ObjectDirective<Element, VClickOutsideValue>["unmounted"]
+    ObjectDirective<Element, VClickOutsideValue<K>>["unmounted"]
   >;
 }
 
@@ -38,12 +57,13 @@ export interface VClickOutside {
  * <div v-click-outside></div>
  * ```
  */
-const vClickOutside: VClickOutside = {
+const vClickOutside: VClickOutside<keyof EventMap> = {
   mounted(el, { value }) {
     if (
       !value ||
       (typeof value !== "function" &&
-        typeof (value as VClickOutsideObjectValue).handler !== "function")
+        typeof (value as VClickOutsideObjectValue<keyof EventMap>).handler !==
+          "function")
     ) {
       throw new TypeError(
         "click-outside: Binding to the directive value must be a function or an object with handler method"
@@ -52,7 +72,7 @@ const vClickOutside: VClickOutside = {
     const cb =
       typeof value === "function"
         ? value
-        : (value as VClickOutsideObjectValue).handler;
+        : (value as VClickOutsideObjectValue<keyof EventMap>).handler;
 
     const stopClickOutsideListener = listenClickOutside(el, cb, value);
     removeClickListenerMap.set(el, stopClickOutsideListener);
@@ -61,7 +81,7 @@ const vClickOutside: VClickOutside = {
     const cb =
       typeof value === "function"
         ? value
-        : (value as VClickOutsideObjectValue).handler;
+        : (value as VClickOutsideObjectValue<keyof EventMap>).handler;
 
     let stopClickOutsideListener = removeClickListenerMap.get(el);
     stopClickOutsideListener?.();

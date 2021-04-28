@@ -13,9 +13,7 @@ import {
 import { ClickOutsideOption } from ".";
 import { addClickListener, EventMap } from "./lib/addClickListener";
 
-export type ClickOutsideHandler<
-  T extends keyof EventMap = "downUp"
-> = EventMap[T];
+export type ClickOutsideHandler<T extends keyof EventMap> = EventMap[T];
 
 type ClickOutsideRawTarget =
   | Element

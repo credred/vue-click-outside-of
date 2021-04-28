@@ -3,7 +3,7 @@ import { Button, EventMap } from "./lib/addClickListener";
 import vClickOutside from "./directive";
 import { ClickOutsideTarget } from "./core";
 
-export interface ClickOutsideOption<T extends keyof EventMap = "downUp"> {
+interface ClickOutsideOption<T extends keyof EventMap> {
   type?: T;
   /**
    * The click outside handler not executed when click target was contained with excluded element.
@@ -27,12 +27,28 @@ export interface ClickOutsideOption<T extends keyof EventMap = "downUp"> {
   button?: Button;
 }
 
+/**
+ * Type helper to make it easier to define clickOutside option.
+ */
+function defineClickOutsideOption<T extends keyof EventMap = "downUp">(
+  option: ClickOutsideOption<T>
+): ClickOutsideOption<T> {
+  return option;
+}
+
 function install(app: App): void {
   app.directive("click-outside", vClickOutside);
 }
 
 export { onClickOutside } from "./hook";
+export {
+  defineVClickOutsideValue,
+  VClickOutsideObjectValue,
+  VClickOutsideFunctionValue,
+} from "./directive";
 export const clickOutside = vClickOutside;
+
+export { ClickOutsideOption, defineClickOutsideOption };
 
 export default {
   install,
