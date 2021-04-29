@@ -21,7 +21,9 @@ export function isComponentPublicInstance(
 }
 
 export function getRealTargetFromVNode(target: VNode): Element | Element[] {
-  if (target.shapeFlag & ShapeFlags.ARRAY_CHILDREN) {
+  if (target.shapeFlag & ShapeFlags.ELEMENT) {
+    return target.el as Element;
+  } else if (target.shapeFlag & ShapeFlags.ARRAY_CHILDREN) {
     return (target.children as VNode[])
       .map((vnode) => getRealTargetFromVNode(vnode))
       .flat();
