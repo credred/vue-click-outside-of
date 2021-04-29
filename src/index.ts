@@ -41,14 +41,15 @@ function install(app: App): void {
 }
 
 export { onClickOutside } from "./hook";
-export {
-  defineVClickOutsideValue,
+export { defineVClickOutsideValue } from "./directive";
+export type {
   VClickOutsideObjectValue,
   VClickOutsideFunctionValue,
 } from "./directive";
 export const clickOutside = vClickOutside;
 
-export { ClickOutsideOption, defineClickOutsideOption };
+export { defineClickOutsideOption };
+export type { ClickOutsideOption };
 
 export default {
   install,
