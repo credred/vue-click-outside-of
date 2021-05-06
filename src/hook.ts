@@ -1,7 +1,7 @@
-import { EventMap } from "./lib/addClickListener";
 import { getCurrentInstance, watchEffect } from "vue";
-import { ClickOutsideOption } from ".";
+import { EventMap } from "./lib/addClickListener";
 import {
+  ClickOutsideOption,
   ClickOutsideHandler,
   ClickOutsideTarget,
   listenClickOutside,

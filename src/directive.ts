@@ -1,7 +1,10 @@
-import { EventMap } from "src/lib/addClickListener";
 import { ObjectDirective } from "vue";
-import { ClickOutsideOption } from ".";
-import { ClickOutsideHandler, listenClickOutside } from "./core";
+import { EventMap } from "./lib/addClickListener";
+import {
+  ClickOutsideOption,
+  ClickOutsideHandler,
+  listenClickOutside,
+} from "./core";
 
 export interface VClickOutsideObjectValue<K extends keyof EventMap>
   extends ClickOutsideOption<K> {
