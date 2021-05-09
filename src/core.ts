@@ -5,6 +5,7 @@ import {
   unref,
 } from "vue";
 import {
+  filterUndef,
   getRealTargetFromVNode,
   isComponentInternalInstance,
   isComponentPublicInstance,
@@ -12,14 +13,13 @@ import {
 } from "./lib";
 import { addClickListener, Button, EventMap } from "./lib/addClickListener";
 
-type ClickOutsideRawTarget =
-  | Element
-  | ComponentPublicInstance
-  | (Element | ComponentPublicInstance)[];
+type ClickOutsideRawTarget = Element | ComponentPublicInstance;
 
 export type ClickOutsideTarget =
   | ClickOutsideRawTarget
+  | ClickOutsideRawTarget[]
   | Ref<ClickOutsideRawTarget | undefined>
+  | Ref<ClickOutsideRawTarget | undefined>[]
   | ComponentInternalInstance;
 
 export type ClickOutsideHandler<T extends keyof EventMap> = EventMap[T];
@@ -57,11 +57,12 @@ export function defineClickOutsideOption<T extends keyof EventMap = "downUp">(
   return option;
 }
 
+type ArrayItem<T extends Array<unknown>> = T extends Array<infer R> ? R : never;
 function getRealTarget(target: ClickOutsideTarget): Element[] {
-  let newTarget:
-    | ClickOutsideRawTarget
-    | ComponentInternalInstance
-    | undefined = unref(target);
+  let newTarget = Array.isArray(target)
+    ? // the reason of using ArrayItem genetic:  typescript can't recognize 't' type
+      target.map((t: ArrayItem<typeof target>) => unref(t))
+    : unref(target);
 
   if (newTarget === undefined) {
     return [];
@@ -72,7 +73,7 @@ function getRealTarget(target: ClickOutsideTarget): Element[] {
   if (!Array.isArray(newTarget)) {
     newTarget = [newTarget];
   }
-  return newTarget
+  return filterUndef(newTarget)
     .map((t) =>
       isComponentPublicInstance(t) ? getRealTargetFromVNode(t.$.subTree) : t
     )
