@@ -9,7 +9,6 @@ import {
   getRealTargetFromVNode,
   isComponentInternalInstance,
   isComponentPublicInstance,
-  NOOP,
 } from "./lib";
 import { addClickListener, Button, EventMap } from "./lib/addClickListener";
 
@@ -83,15 +82,10 @@ function getRealTarget(target: ClickOutsideTarget): Element[] {
 export function listenClickOutside<T extends keyof EventMap = "downUp">(
   target: ClickOutsideTarget,
   cb: ClickOutsideHandler<T>,
-  option: ClickOutsideOption<T>
+  option: ClickOutsideOption<T> = {}
 ): () => void {
   const type = option.type || "downUp";
   const button = option.button || "all";
-  const realTarget = getRealTarget(target);
-  const excludeTarget = option.exclude ? getRealTarget(option.exclude) : [];
-  if (realTarget.length === 0) {
-    return NOOP;
-  }
 
   return addClickListener(
     type || "downUp",
@@ -99,6 +93,11 @@ export function listenClickOutside<T extends keyof EventMap = "downUp">(
       mousedownEvOrClickEv: MouseEvent | undefined,
       mouseupEv?: MouseEvent
     ) {
+      const realTarget = getRealTarget(target);
+      const excludeTarget = option.exclude ? getRealTarget(option.exclude) : [];
+      if (realTarget.length === 0) {
+        return;
+      }
       const mousedownEvOrClickTarget = mousedownEvOrClickEv
         ? (mousedownEvOrClickEv.target as Element)
         : null;
