@@ -40,7 +40,7 @@ export function defineVClickOutsideValue<T extends keyof EventMap>(
   return value;
 }
 
-const removeClickListenerMap = new Map<Element, () => void>();
+const removeClickListenerMap = new WeakMap<Element, () => void>();
 
 export interface VClickOutside<K extends keyof EventMap = "downUp"> {
   mounted: NonNullable<
@@ -80,7 +80,10 @@ const vClickOutside: VClickOutside<keyof EventMap> = {
     const stopClickOutsideListener = listenClickOutside(el, cb, value);
     removeClickListenerMap.set(el, stopClickOutsideListener);
   },
-  updated(el, { value }) {
+  updated(el, { value, oldValue }) {
+    if (value === oldValue) {
+      return;
+    }
     const cb =
       typeof value === "function"
         ? value

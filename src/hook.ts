@@ -1,4 +1,4 @@
-import { getCurrentInstance, watchEffect } from "vue";
+import { getCurrentInstance, onUnmounted } from "vue";
 import { EventMap } from "./lib/addClickListener";
 import {
   ClickOutsideOption,
@@ -12,11 +12,11 @@ export type ClickOutsideStopHandler = () => void;
 export function onClickOutside<T extends keyof EventMap>(
   handler: ClickOutsideHandler<T>,
   target?: ClickOutsideTarget,
-  option: ClickOutsideOption<T> = {}
+  option?: ClickOutsideOption<T>
 ): ClickOutsideStopHandler {
+  const currentInstance = getCurrentInstance();
   let newTarget: ClickOutsideTarget;
   if (target === undefined) {
-    const currentInstance = getCurrentInstance();
     if (currentInstance === null) {
       throw new TypeError(
         "onClickOutside hook is called when there is no active component instance to be associated with." +
@@ -27,20 +27,17 @@ export function onClickOutside<T extends keyof EventMap>(
   } else {
     newTarget = target;
   }
-  const clickOutsideStopHandler = watchEffect(
-    (onInvalidate) => {
-      const stopClickOutsideListener = listenClickOutside(
-        newTarget,
-        handler,
-        option
-      );
-
-      onInvalidate(() => {
-        stopClickOutsideListener();
-      });
-    },
-    { flush: "post" }
+  const stopClickOutsideListener = listenClickOutside(
+    newTarget,
+    handler,
+    option
   );
 
-  return clickOutsideStopHandler;
+  if (currentInstance) {
+    onUnmounted(() => {
+      stopClickOutsideListener();
+    });
+  }
+
+  return stopClickOutsideListener;
 }

@@ -3,6 +3,7 @@ import {
   ComponentPublicInstance,
   Ref,
   unref,
+  watchEffect,
 } from "vue";
 import {
   filterUndef,
@@ -84,48 +85,56 @@ export function listenClickOutside<T extends keyof EventMap = "downUp">(
   cb: ClickOutsideHandler<T>,
   option: ClickOutsideOption<T> = {}
 ): () => void {
-  const type = option.type || "downUp";
-  const button = option.button || "all";
+  return watchEffect((onInvalidate) => {
+    const type = option.type || "downUp";
+    const button = option.button || "all";
 
-  return addClickListener(
-    type || "downUp",
-    function clickListener(
-      mousedownEvOrClickEv: MouseEvent | undefined,
-      mouseupEv?: MouseEvent
-    ) {
-      const realTarget = getRealTarget(target);
-      const excludeTarget = option.exclude ? getRealTarget(option.exclude) : [];
-      if (realTarget.length === 0) {
-        return;
-      }
-      const mousedownEvOrClickTarget = mousedownEvOrClickEv
-        ? (mousedownEvOrClickEv.target as Element)
-        : null;
-      const mouseupEvTargetOrNull =
-        // the reason of disable no-non-null-assertion:  mouseupEv type must be MouseEvent if type is 'downUp'
-        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-        type === "downUp" ? (mouseupEv!.target as Element) : null;
-      const cbArgs =
-        type === "downUp"
-          ? // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-            ([mousedownEvOrClickEv, mouseupEv!] as const)
-          : // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-            ([mousedownEvOrClickEv!] as const);
-      if (
-        [...realTarget, ...excludeTarget].some(
-          (el) =>
-            el.contains(mousedownEvOrClickTarget) ||
-            el.contains(mouseupEvTargetOrNull)
-        ) ||
-        // the reason of disable @typescript-eslint/no-explicit-any:  ts can't recognize right typing
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        (option.before && !option.before(...(cbArgs as any)))
+    const stop = addClickListener(
+      type || "downUp",
+      function clickListener(
+        mousedownEvOrClickEv: MouseEvent | undefined,
+        mouseupEv?: MouseEvent
       ) {
-        return;
-      }
-      // the reason of using 'as' statement: ts can't recognize the right typing of cb paramter
-      cb(...(cbArgs as [MouseEvent, MouseEvent]));
-    },
-    button
-  );
+        const realTarget = getRealTarget(target);
+        const excludeTarget = option.exclude
+          ? getRealTarget(option.exclude)
+          : [];
+        if (realTarget.length === 0) {
+          return;
+        }
+        const mousedownEvOrClickTarget = mousedownEvOrClickEv
+          ? (mousedownEvOrClickEv.target as Element)
+          : null;
+        const mouseupEvTargetOrNull =
+          // the reason of disable no-non-null-assertion:  mouseupEv type must be MouseEvent if type is 'downUp'
+          // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+          type === "downUp" ? (mouseupEv!.target as Element) : null;
+        const cbArgs =
+          type === "downUp"
+            ? // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+              ([mousedownEvOrClickEv, mouseupEv!] as const)
+            : // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+              ([mousedownEvOrClickEv!] as const);
+        if (
+          [...realTarget, ...excludeTarget].some(
+            (el) =>
+              el.contains(mousedownEvOrClickTarget) ||
+              el.contains(mouseupEvTargetOrNull)
+          ) ||
+          // the reason of disable @typescript-eslint/no-explicit-any:  ts can't recognize right typing
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          (option.before && !option.before(...(cbArgs as any)))
+        ) {
+          return;
+        }
+        // the reason of using 'as' statement: ts can't recognize the right typing of cb paramter
+        cb(...(cbArgs as [MouseEvent, MouseEvent]));
+      },
+      button
+    );
+
+    onInvalidate(() => {
+      stop();
+    });
+  });
 }
