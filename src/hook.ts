@@ -24,6 +24,8 @@ export function onClickOutside<T extends keyof EventMap>(
       );
     }
     newTarget = currentInstance;
+  } else {
+    newTarget = target;
   }
   const clickOutsideStopHandler = watchEffect(
     (onInvalidate) => {
