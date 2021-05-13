@@ -16,8 +16,8 @@ export function addClickListener<K extends keyof EventMap>(
 ): StopClickListener {
   let stopClickListener: (() => void) | undefined;
   if (type === "downUp") {
-    let mousedownLeftEv: MouseEvent;
-    let mousedownRightEv: MouseEvent;
+    let mousedownLeftEv: MouseEvent | undefined;
+    let mousedownRightEv: MouseEvent | undefined;
     const mousedownHandler = (ev: MouseEvent) => {
       if (ev.button === 0 && button !== "right") {
         mousedownLeftEv = ev;
@@ -27,10 +27,12 @@ export function addClickListener<K extends keyof EventMap>(
     };
     const mouseupHandler = (mouseupEv: MouseEvent) => {
       if (mouseupEv.button === 0 && button !== "right") {
-        clickListener(mousedownLeftEv, mouseupEv);
+        (clickListener as EventMap["downUp"])(mousedownLeftEv, mouseupEv);
+        mousedownLeftEv = undefined;
       }
       if (mouseupEv.button === 2 && button !== "left") {
-        clickListener(mousedownRightEv, mouseupEv);
+        (clickListener as EventMap["downUp"])(mousedownRightEv, mouseupEv);
+        mousedownRightEv = undefined;
       }
     };
 
