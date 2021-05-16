@@ -19,6 +19,7 @@ export function addClickListener<K extends keyof EventMap>(
     let mousedownLeftEv: MouseEvent | undefined;
     let mousedownRightEv: MouseEvent | undefined;
     const mousedownHandler = (ev: MouseEvent) => {
+      /* istanbul ignore else */
       if (ev.button === 0 && button !== "right") {
         mousedownLeftEv = ev;
       } else if (ev.button === 2 && button !== "left") {
