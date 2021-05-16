@@ -2,7 +2,7 @@ import { App } from "vue";
 import vClickOutside from "./directive";
 
 export default function install(app: App): void {
-  app.directive("click-outside", vClickOutside);
+  app.directive("ClickOutside", vClickOutside);
 }
 
 export type { ClickOutsideOption } from "./core";
@@ -13,4 +13,4 @@ export type {
   VClickOutsideObjectValue,
   VClickOutsideFunctionValue,
 } from "./directive";
-export const clickOutside = vClickOutside;
+export const ClickOutside = vClickOutside;
