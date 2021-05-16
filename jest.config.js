@@ -8,5 +8,5 @@ module.exports = {
     __NAME__: packageJSON.name,
   },
   testMatch: ["<rootDir>/__tests__/**/?*.spec.[jt]s?(x)"],
-  collectCoverageFrom: ["src/**"]
+  collectCoverageFrom: ["src/**"],
 };

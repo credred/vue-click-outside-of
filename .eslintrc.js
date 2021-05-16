@@ -28,5 +28,6 @@ module.exports = {
     "rollup.config.js",
     "scripts/**",
     "dist/**",
+    "coverage/**",
   ],
 };
