@@ -80,6 +80,35 @@ function getRealTarget(target: ClickOutsideTarget): Element[] {
     .flat();
 }
 
+export const outsideTargetSiblingMap = new WeakMap<Element, Element>();
+
+/**
+ * escape hatch for teleport element
+ */
+export function markSibling(outsideTarget: Element, sibling: Element): void {
+  outsideTargetSiblingMap.set(outsideTarget, sibling);
+}
+
+export function unmarkSibling(outsideTarget: Element): void {
+  outsideTargetSiblingMap.delete(outsideTarget);
+}
+
+function isOutside(targets: Element[], element: Element | null): boolean {
+  const targetSet = new Set(targets);
+
+  while (element) {
+    const sibling = outsideTargetSiblingMap.get(element);
+    if (
+      targetSet.has(element) ||
+      (sibling && targets.some((el) => el.contains(sibling)))
+    ) {
+      return false;
+    }
+    element = element.parentElement;
+  }
+  return true;
+}
+
 export function listenClickOutside<T extends keyof EventMap = "downUp">(
   target: ClickOutsideTarget,
   cb: ClickOutsideHandler<T>,
@@ -102,7 +131,7 @@ export function listenClickOutside<T extends keyof EventMap = "downUp">(
         if (realTarget.length === 0) {
           return;
         }
-        const mousedownEvOrClickTarget = mousedownEvOrClickEv
+        const mousedownEvOrClickEvTargetOrNull = mousedownEvOrClickEv
           ? (mousedownEvOrClickEv.target as Element)
           : null;
         const mouseupEvTargetOrNull =
@@ -116,10 +145,13 @@ export function listenClickOutside<T extends keyof EventMap = "downUp">(
             : // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
               ([mousedownEvOrClickEv!] as const);
         if (
-          [...realTarget, ...excludeTarget].some(
-            (el) =>
-              el.contains(mousedownEvOrClickTarget) ||
-              el.contains(mouseupEvTargetOrNull)
+          !isOutside(
+            [...realTarget, ...excludeTarget],
+            mousedownEvOrClickEvTargetOrNull
+          ) ||
+          !isOutside(
+            [...realTarget, ...excludeTarget],
+            mouseupEvTargetOrNull
           ) ||
           // the reason of disable @typescript-eslint/no-explicit-any:  ts can't recognize right typing
           // eslint-disable-next-line @typescript-eslint/no-explicit-any

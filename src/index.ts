@@ -6,7 +6,7 @@ export default function install(app: App): void {
 }
 
 export type { ClickOutsideOption } from "./core";
-export { defineClickOutsideOption } from "./core";
+export { defineClickOutsideOption, markSibling, unmarkSibling } from "./core";
 export { onClickOutside } from "./hook";
 export { defineVClickOutsideValue } from "./directive";
 export type {

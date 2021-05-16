@@ -3,6 +3,7 @@ import {
   defineComponent,
   getCurrentInstance,
   nextTick,
+  onMounted,
   reactive,
   ref,
 } from "@vue/runtime-core";
@@ -10,6 +11,7 @@ import {
   defineClickOutsideOption,
   listenClickOutside as originListenClickOutside,
 } from "../src/core";
+import { markSibling, unmarkSibling } from "../src/index";
 import { mount } from "./_utils/vueHelper";
 import { assertRefNoUndefined } from "./_utils/typeHelper";
 import { clearAfter } from "./_utils/clearAfter";
@@ -245,9 +247,7 @@ describe(`${__NAME__} core`, () => {
           <Child ref="childCompRef"></Child>
         </div>`,
       setup() {
-        onMounted(() => {
-          listenClickOutside(childCompRef, handler, { type: "click" });
-        });
+        listenClickOutside(childCompRef, handler, { type: "click" });
         return { childCompRef };
       },
     });
@@ -533,6 +533,57 @@ describe(`${__NAME__} core`, () => {
 
     outsideElementRef.value.dispatchEvent(
       new MouseEvent("contextmenu", { bubbles: true })
+    );
+    expect(handler).toBeCalled();
+  });
+
+  it("escape hatch for teleport element(markSibling/unmarkSibling function)", () => {
+    const isShowSelfElement = ref(false);
+    const selfElementRef = ref<HTMLElement>();
+    const childElementRef = ref<HTMLElement>();
+    const teleportElementRef = ref<HTMLElement>();
+    const App = defineComponent({
+      template: `
+          <div>
+            <div ref="selfElementRef">
+              <div ref="childElementRef"></div>
+              <teleport to="body">
+                <div ref="teleportElementRef"></div>
+              </teleport>
+            </div>
+          </div>`,
+      setup() {
+        listenClickOutside(selfElementRef, handler, {
+          type: "click",
+        });
+        onMounted(() => {
+          assertRefNoUndefined(childElementRef);
+          assertRefNoUndefined(teleportElementRef);
+          markSibling(teleportElementRef.value, childElementRef.value);
+        });
+        return {
+          isShowSelfElement,
+          selfElementRef,
+          childElementRef,
+          teleportElementRef,
+        };
+      },
+    });
+
+    mount(App);
+
+    assertRefNoUndefined(selfElementRef);
+    assertRefNoUndefined(childElementRef);
+    assertRefNoUndefined(teleportElementRef);
+
+    teleportElementRef.value.dispatchEvent(
+      new MouseEvent("click", { bubbles: true })
+    );
+    expect(handler).not.toBeCalled();
+
+    unmarkSibling(teleportElementRef.value);
+    teleportElementRef.value.dispatchEvent(
+      new MouseEvent("click", { bubbles: true })
     );
     expect(handler).toBeCalled();
   });
