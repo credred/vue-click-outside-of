@@ -25,6 +25,16 @@ export type ClickOutsideTarget =
 export type ClickOutsideHandler<T extends keyof EventMap> = EventMap[T];
 
 export interface ClickOutsideOption<T extends keyof EventMap> {
+  /**
+   * Indicates which event should trigger click outside handler.
+   *
+   * - downUp - *default* value. It was composed of mousedown event and mouseup event.
+   *   click outside handler will not trigger as long as one of events target is internal element.
+   * - click
+   * - dblclick
+   *
+   * @default "all"
+   */
   type?: T;
   /**
    * The click outside handler not executed when click target was contained with excluded element.
@@ -33,16 +43,20 @@ export interface ClickOutsideOption<T extends keyof EventMap> {
    */
   exclude?: ClickOutsideTarget;
   /**
-   * The function will be executed before executing click outside handler and
-   * it should return a boolean if click outside handler should be fire or not.
+   * The function will be executed before executing click outside handler.
+   * it should return a boolean to decide click outside handler should be fire or not.
    *
    * You can use *exclude* option also if you want to exclude some element only.
    */
   before?: (...args: Parameters<EventMap[T]>) => boolean;
   /**
-   * indicates which button was pressed on the mouse to trigger the click outside handler
+   * indicates which button was pressed on the mouse to trigger the click outside handler.
+   * The option not support `dblclick` type.
    *
-   * not support "dblclick" type
+   * - "left"
+   * - "right"
+   * - "all" -  "default value".
+   *
    * @default "all"
    */
   button?: Button;
