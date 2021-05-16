@@ -25,6 +25,7 @@ module.exports = {
   ignorePatterns: [
     ".eslintrc.js",
     "jest.config.js",
+    "rollup.config.js",
     "scripts/**",
     "dist/**",
   ],
