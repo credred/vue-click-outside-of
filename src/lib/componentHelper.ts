@@ -3,7 +3,7 @@ import {
   ComponentPublicInstance,
   isVNode,
   VNode,
-} from "@vue/runtime-core";
+} from "vue";
 import { ShapeFlags } from "./shapeFlags";
 export function isComponentInternalInstance(
   instance: unknown
