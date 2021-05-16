@@ -90,7 +90,7 @@ export function listenClickOutside<T extends keyof EventMap = "downUp">(
     const button = option.button || "all";
 
     const stop = addClickListener(
-      type || "downUp",
+      type,
       function clickListener(
         mousedownEvOrClickEv: MouseEvent | undefined,
         mouseupEv?: MouseEvent

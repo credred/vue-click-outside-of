@@ -40,8 +40,6 @@ export function defineVClickOutsideValue<T extends keyof EventMap>(
   return value;
 }
 
-const removeClickListenerMap = new WeakMap<Element, () => void>();
-
 export interface VClickOutside<K extends keyof EventMap = "downUp"> {
   mounted: NonNullable<
     ObjectDirective<Element, VClickOutsideValue<K>>["mounted"]
@@ -54,6 +52,34 @@ export interface VClickOutside<K extends keyof EventMap = "downUp"> {
   >;
 }
 
+const removeClickListenerMap = new WeakMap<Element, () => void>();
+
+function startListen(el: Element, value: VClickOutsideValue<keyof EventMap>) {
+  if (
+    !value ||
+    (typeof value !== "function" &&
+      typeof (value as VClickOutsideObjectValue<keyof EventMap>).handler !==
+        "function")
+  ) {
+    throw new TypeError(
+      "click-outside: Binding to the directive value must be a function or an object with handler method"
+    );
+  }
+  const cb =
+    typeof value === "function"
+      ? value
+      : (value as VClickOutsideObjectValue<keyof EventMap>).handler;
+
+  const stopClickOutsideListener = listenClickOutside(el, cb, value);
+  removeClickListenerMap.set(el, stopClickOutsideListener);
+}
+
+function stopListen(el: Element) {
+  const stopClickOutsideListener = removeClickListenerMap.get(el);
+  stopClickOutsideListener?.();
+  removeClickListenerMap.delete(el);
+}
+
 /**
  * @example
  * ```vue
@@ -62,44 +88,19 @@ export interface VClickOutside<K extends keyof EventMap = "downUp"> {
  */
 const vClickOutside: VClickOutside<keyof EventMap> = {
   mounted(el, { value }) {
-    if (
-      !value ||
-      (typeof value !== "function" &&
-        typeof (value as VClickOutsideObjectValue<keyof EventMap>).handler !==
-          "function")
-    ) {
-      throw new TypeError(
-        "click-outside: Binding to the directive value must be a function or an object with handler method"
-      );
-    }
-    const cb =
-      typeof value === "function"
-        ? value
-        : (value as VClickOutsideObjectValue<keyof EventMap>).handler;
-
-    const stopClickOutsideListener = listenClickOutside(el, cb, value);
-    removeClickListenerMap.set(el, stopClickOutsideListener);
+    startListen(el, value);
   },
   updated(el, { value, oldValue }) {
     if (value === oldValue) {
       return;
     }
-    const cb =
-      typeof value === "function"
-        ? value
-        : (value as VClickOutsideObjectValue<keyof EventMap>).handler;
 
-    let stopClickOutsideListener = removeClickListenerMap.get(el);
-    stopClickOutsideListener?.();
+    stopListen(el);
 
-    stopClickOutsideListener = listenClickOutside(el, cb, value);
-    removeClickListenerMap.set(el, stopClickOutsideListener);
+    startListen(el, value);
   },
   unmounted(el) {
-    // When el are unmounted all of the clickListener which register on it need to be removed.
-    const stopClickOutsideListener = removeClickListenerMap.get(el);
-    stopClickOutsideListener?.();
-    removeClickListenerMap.delete(el);
+    stopListen(el);
   },
 };
 
