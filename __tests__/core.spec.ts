@@ -538,7 +538,6 @@ describe(`${__NAME__} core`, () => {
   });
 
   it("escape hatch for teleport element(markSibling/unmarkSibling function)", () => {
-    const isShowSelfElement = ref(false);
     const selfElementRef = ref<HTMLElement>();
     const childElementRef = ref<HTMLElement>();
     const teleportElementRef = ref<HTMLElement>();
@@ -562,7 +561,6 @@ describe(`${__NAME__} core`, () => {
           markSibling(teleportElementRef.value, childElementRef.value);
         });
         return {
-          isShowSelfElement,
           selfElementRef,
           childElementRef,
           teleportElementRef,
