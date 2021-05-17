@@ -22,7 +22,7 @@ The function will be executed before executing `click outside handler`.
 
 It should return a `boolean` to decide `click outside handler` should be fire or not.
 ### exclude
-An `element` or An `Array of elements`. The `click outside handler` not executed when click target was contained with excluded element.
+An `element` or An `Array of elements`. The `click outside handler` will not be executed when the `event target` was contained with excluded element.
 ### button
 Indicates which button was pressed on the mouse to trigger the `click outside handler`. The option not support `dblclick` type.
 - "left"
@@ -112,39 +112,61 @@ export default {
 </script>
 ```
 
-## 🎗️escape hatch for teleport element
+## escape hatch for Teleport
+Sometimes, you may not know which elements should be excluded when you register `click outside handler`. This is why we provide the `markSibling` method.
+```vue
+<template>
+  <div ref="childElementRef">inside element</div>
+  <teleport to="body">
+    <div ref="teleportElementRef">teleport element</div>
+  </teleport>
+</template>
+
+<script>
+// Child.vue
+import { onMounted, ref } from "vue";
+import { markSibling } from "vue-click-outside-of";
+
+export default {
+  setup() {
+    const childElementRef = ref();
+    const teleportElementRef = ref();
+    onMounted(() => {
+      // avoid executing the `click outside handler` which registered on the parent component after the element belonging to `<Teleport>` is clicked.
+      markSibling(teleportElementRef.value, childElementRef.value);
+    });
+    return {
+      childElementRef,
+      teleportElementRef,
+    };
+  },
+};
+</script>
+```
+
 ```vue
 <template>
   <div ref="target">
-    <div ref="childElementRef">inside element</div>
-    <teleport to="body">
-      <div ref="teleportElementRef">teleport element</div>
-    </teleport>
+    <Child></Child>
   </div>
   <div>outside element</div>
 </template>
 
 <script>
 import { onMounted, ref } from "vue";
-import { onClickOutside, markSibling } from "vue-click-outside-of";
+import { onClickOutside } from "vue-click-outside-of";
+import Child from "./Child.vue";
 
 export default {
+  components: {
+    Child,
+  },
   setup() {
     const target = ref();
-    const childElementRef = ref();
-    const teleportElementRef = ref();
     onClickOutside(() => {
       console.log("click outside");
     }, target);
-    onMounted(() => {
-      // avoid `click outside handler` was executed when clicked on teleport element
-      markSibling(teleportElementRef.value, childElementRef.value);
-    });
-    return {
-      target,
-      childElementRef,
-      teleportElementRef,
-    };
+    return { target };
   },
 };
 </script>
