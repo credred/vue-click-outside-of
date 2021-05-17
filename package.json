@@ -15,7 +15,7 @@
   ],
   "scripts": {
     "build": "rollup -c rollup.config.js",
-    "jest": "jest",
+    "test": "jest",
     "lint": "eslint ."
   },
   "files": [
