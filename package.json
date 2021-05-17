@@ -18,9 +18,15 @@
     "test": "jest",
     "lint": "eslint ."
   },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/credred/vue-click-outside-of.git"
+  },
+  "bugs": "https://github.com/credred/vue-click-outside-of/issues",
   "files": [
     "src",
-    "dist"
+    "dist",
+    "tsconfig.json"
   ],
   "types": "./dist/index.dts",
   "main": "./dist/vue-click-outside-of.umd.js",
