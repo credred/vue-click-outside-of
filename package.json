@@ -28,7 +28,7 @@
     "dist",
     "tsconfig.json"
   ],
-  "types": "./dist/index.dts",
+  "types": "./dist/index.d.ts",
   "main": "./dist/vue-click-outside-of.umd.js",
   "module": "./dist/vue-click-outside-of.es.js",
   "exports": {
