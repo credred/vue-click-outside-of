@@ -5,20 +5,27 @@ import {
 } from "../../src/lib/addClickListener";
 import { clearAfter } from "../_utils/clearAfter";
 
-const originAddEventListener = document.documentElement.addEventListener.bind(
+function createEventListener(target: HTMLElement | Document) {
+  // use 'as' statement reason:
+  // typescript can't recognize right type when we calling target.addEventListener("mousedown", ...)
+  target = target as HTMLElement;
+  const originAddEventListener = target.addEventListener.bind(target);
+  const addEventListener = jest
+    .spyOn(target, "addEventListener")
+    .mockImplementation((...args) => {
+      originAddEventListener(...args);
+      // ensure every test suite has clear event listener
+      clearAfter(() => target.removeEventListener(...args));
+    });
+  const removeEventListener = jest.spyOn(target, "removeEventListener");
+
+  return { originAddEventListener, addEventListener, removeEventListener };
+}
+
+const { addEventListener, removeEventListener } = createEventListener(
   document.documentElement
 );
-const addEventListener = jest
-  .spyOn(document.documentElement, "addEventListener")
-  .mockImplementation((...args) => {
-    originAddEventListener(...args);
-    // ensure every test suite has clear event listener
-    clearAfter(() => document.documentElement.removeEventListener(...args));
-  });
-const removeEventListener = jest.spyOn(
-  document.documentElement,
-  "removeEventListener"
-);
+
 const handler = jest.fn();
 
 afterEach(() => {
@@ -42,6 +49,17 @@ describe(`${__NAME__} addEventListener`, () => {
       target: option.target || document.documentElement,
     };
   }
+
+  it("should add/remove event listener on target element", () => {
+    const target = document.createElement("div");
+    const { addEventListener, removeEventListener } = createEventListener(
+      target
+    );
+    const stop = addClickListener(defineOption("downUp", { target }), handler);
+    expect(addEventListener).toBeCalled();
+    stop();
+    expect(removeEventListener).toBeCalled();
+  });
 
   it("invalid type", () => {
     expect(() => {
