@@ -12,6 +12,7 @@ type StopClickListener = () => void;
 export interface AddClickListenerOption<K extends keyof EventMap> {
   type: K;
   button: Button;
+  target: HTMLElement | Document | Window | SVGElement;
 }
 
 export function addClickListener<K extends keyof EventMap>(
@@ -19,6 +20,9 @@ export function addClickListener<K extends keyof EventMap>(
   clickListener: EventMap[K]
 ): StopClickListener {
   const { type, button } = option;
+  // use 'as' statement reason:
+  // typescript can't recognize right type when we calling target.addEventListener("mousedown", ...)
+  const target = option.target as HTMLElement;
   let stopClickListener: (() => void) | undefined;
 
   if (type === "downUp") {
@@ -43,46 +47,40 @@ export function addClickListener<K extends keyof EventMap>(
       }
     };
 
-    document.documentElement.addEventListener("mousedown", mousedownHandler);
-    document.documentElement.addEventListener("mouseup", mouseupHandler);
+    target.addEventListener("mousedown", mousedownHandler);
+    target.addEventListener("mouseup", mouseupHandler);
 
     stopClickListener = () => {
-      document.documentElement.removeEventListener(
-        "mousedown",
-        mousedownHandler
-      );
-      document.documentElement.removeEventListener("mouseup", mouseupHandler);
+      target.removeEventListener("mousedown", mousedownHandler);
+      target.removeEventListener("mouseup", mouseupHandler);
     };
   } else if (type === "click") {
     function clickHandler(ev: MouseEvent) {
       (clickListener as EventMap["click"])(ev);
     }
     if (button !== "left") {
-      document.documentElement.addEventListener("contextmenu", clickHandler);
+      target.addEventListener("contextmenu", clickHandler);
     }
     if (button !== "right") {
-      document.documentElement.addEventListener("click", clickHandler);
+      target.addEventListener("click", clickHandler);
     }
 
     stopClickListener = () => {
       if (button !== "left") {
-        document.documentElement.removeEventListener(
-          "contextmenu",
-          clickHandler
-        );
+        target.removeEventListener("contextmenu", clickHandler);
       }
       if (button !== "right") {
-        document.documentElement.removeEventListener("click", clickHandler);
+        target.removeEventListener("click", clickHandler);
       }
     };
   } else if (type === "dblclick") {
     function clickHandler(ev: MouseEvent) {
       (clickListener as EventMap["dblclick"])(ev);
     }
-    document.documentElement.addEventListener("dblclick", clickHandler);
+    target.addEventListener("dblclick", clickHandler);
 
     stopClickListener = () => {
-      document.documentElement.removeEventListener("dblclick", clickHandler);
+      target.removeEventListener("dblclick", clickHandler);
     };
   } else {
     // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
