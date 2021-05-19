@@ -65,6 +65,10 @@ export interface ClickOutsideOption<T extends keyof EventMap> {
    * @default "all"
    */
   button?: Button;
+  /**
+   * @default document.documentElement
+   */
+  background?: HTMLElement | Document | Window | SVGElement;
 }
 
 /**
@@ -131,6 +135,7 @@ function isOutside(targets: Element[], element: Element | null): boolean {
 const defaultOption = {
   type: "downUp",
   button: "all",
+  background: document.documentElement,
 } as const;
 
 export function listenClickOutside<T extends keyof EventMap = "downUp">(
@@ -143,6 +148,7 @@ export function listenClickOutside<T extends keyof EventMap = "downUp">(
     const addClickListenerOption: AddClickListenerOption<T> = {
       type: type as T,
       button: option.button || defaultOption.button,
+      target: option.background || defaultOption.background,
     };
 
     const stop = addClickListener(
