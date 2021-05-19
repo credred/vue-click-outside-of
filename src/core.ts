@@ -11,7 +11,12 @@ import {
   isComponentInternalInstance,
   isComponentPublicInstance,
 } from "./lib";
-import { addClickListener, Button, EventMap } from "./lib/addClickListener";
+import {
+  addClickListener,
+  AddClickListenerOption,
+  Button,
+  EventMap,
+} from "./lib/addClickListener";
 
 type ClickOutsideRawTarget = Element | ComponentPublicInstance;
 
@@ -123,17 +128,25 @@ function isOutside(targets: Element[], element: Element | null): boolean {
   return true;
 }
 
+const defaultOption = {
+  type: "downUp",
+  button: "all",
+} as const;
+
 export function listenClickOutside<T extends keyof EventMap = "downUp">(
   target: ClickOutsideTarget,
   cb: ClickOutsideHandler<T>,
   option: ClickOutsideOption<T> = {}
 ): () => void {
   return watchEffect((onInvalidate) => {
-    const type = option.type || "downUp";
-    const button = option.button || "all";
+    const type = option.type || defaultOption.type;
+    const addClickListenerOption: AddClickListenerOption<T> = {
+      type: type as T,
+      button: option.button || defaultOption.button,
+    };
 
     const stop = addClickListener(
-      type,
+      addClickListenerOption,
       function clickListener(
         mousedownEvOrClickEv: MouseEvent | undefined,
         mouseupEv?: MouseEvent
@@ -175,8 +188,7 @@ export function listenClickOutside<T extends keyof EventMap = "downUp">(
         }
         // the reason of using 'as' statement: ts can't recognize the right typing of cb paramter
         cb(...(cbArgs as [MouseEvent, MouseEvent]));
-      },
-      button
+      }
     );
 
     onInvalidate(() => {
