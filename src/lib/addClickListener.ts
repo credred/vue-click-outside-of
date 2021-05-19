@@ -9,12 +9,18 @@ export type Button = "left" | "right" | "all";
 
 type StopClickListener = () => void;
 
+export interface AddClickListenerOption<K extends keyof EventMap> {
+  type: K;
+  button: Button;
+}
+
 export function addClickListener<K extends keyof EventMap>(
-  type: K,
-  clickListener: EventMap[K],
-  button: Button
+  option: AddClickListenerOption<K>,
+  clickListener: EventMap[K]
 ): StopClickListener {
+  const { type, button } = option;
   let stopClickListener: (() => void) | undefined;
+
   if (type === "downUp") {
     let mousedownLeftEv: MouseEvent | undefined;
     let mousedownRightEv: MouseEvent | undefined;

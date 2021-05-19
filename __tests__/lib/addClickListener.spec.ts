@@ -31,12 +31,12 @@ describe(`${__NAME__} addEventListener`, () => {
   it("invalid type", () => {
     expect(() => {
       // @ts-expect-error test invalid type
-      addClickListener("invalidType", handler, "all");
+      addClickListener({ type: "invalidType", button: "all" }, handler);
     }).toThrowError();
   });
 
   it("'downUp' type", () => {
-    const stop = addClickListener("downUp", handler, "all");
+    const stop = addClickListener({ type: "downUp", button: "all" }, handler);
 
     expect(addEventListener).toBeCalledTimes(2);
     expect(addEventListener).toBeCalledWith("mousedown", expect.any(Function));
@@ -53,7 +53,7 @@ describe(`${__NAME__} addEventListener`, () => {
   });
 
   it("'click' type and 'all' button", () => {
-    const stop = addClickListener("click", handler, "all");
+    const stop = addClickListener({ type: "click", button: "all" }, handler);
 
     expect(addEventListener).toBeCalledTimes(2);
     expect(addEventListener).toBeCalledWith(
@@ -73,7 +73,7 @@ describe(`${__NAME__} addEventListener`, () => {
   });
 
   it("'click' type and 'left' button", () => {
-    const stop = addClickListener("click", handler, "left");
+    const stop = addClickListener({ type: "click", button: "left" }, handler);
 
     expect(addEventListener).toBeCalledTimes(1);
     expect(addEventListener).toBeCalledWith("click", expect.any(Function));
@@ -85,7 +85,7 @@ describe(`${__NAME__} addEventListener`, () => {
   });
 
   it("'click' type and 'right' button", () => {
-    const stop = addClickListener("click", handler, "right");
+    const stop = addClickListener({ type: "click", button: "right" }, handler);
 
     expect(addEventListener).toBeCalledTimes(1);
     expect(addEventListener).toBeCalledWith(
@@ -103,7 +103,10 @@ describe(`${__NAME__} addEventListener`, () => {
   });
 
   it("'dblclick' type", () => {
-    const stop = addClickListener("dblclick", handler, "left");
+    const stop = addClickListener(
+      { type: "dblclick", button: "left" },
+      handler
+    );
 
     expect(addEventListener).toBeCalledTimes(1);
     expect(addEventListener).toBeCalledWith("dblclick", expect.any(Function));
@@ -118,7 +121,7 @@ describe(`${__NAME__} addEventListener`, () => {
   });
 
   it("should trigger handler properly if registration with 'downUp' type with 'left' button", () => {
-    addClickListener("downUp", handler, "all");
+    addClickListener({ type: "downUp", button: "all" }, handler);
 
     document.documentElement.dispatchEvent(
       new MouseEvent("mousedown", { button: 0 })
@@ -131,7 +134,7 @@ describe(`${__NAME__} addEventListener`, () => {
   });
 
   it("should trigger handler properly if registration with 'downUp' type with 'right' button", () => {
-    addClickListener("downUp", handler, "all");
+    addClickListener({ type: "downUp", button: "all" }, handler);
 
     document.documentElement.dispatchEvent(
       new MouseEvent("mousedown", { button: 2 })
@@ -144,7 +147,7 @@ describe(`${__NAME__} addEventListener`, () => {
   });
 
   it("should trigger handler properly if registration with 'downUp' type with 'all' button", () => {
-    addClickListener("downUp", handler, "all");
+    addClickListener({ type: "downUp", button: "all" }, handler);
 
     document.documentElement.dispatchEvent(
       new MouseEvent("mousedown", { button: 0 })
@@ -166,7 +169,7 @@ describe(`${__NAME__} addEventListener`, () => {
   });
 
   it("should keep left mousedown event after right mousedown event triggered if registration with 'downUp' type with 'all' button", () => {
-    addClickListener("downUp", handler, "all");
+    addClickListener({ type: "downUp", button: "all" }, handler);
 
     const mousedownLeftEv = new MouseEvent("mousedown", { button: 0 });
     const mouseupLeftEv = new MouseEvent("mouseup", { button: 0 });
@@ -185,7 +188,7 @@ describe(`${__NAME__} addEventListener`, () => {
   });
 
   it("mousedown event may be undefined", () => {
-    addClickListener("downUp", handler, "all");
+    addClickListener({ type: "downUp", button: "all" }, handler);
 
     const mouseupEv = new MouseEvent("mouseup");
 
@@ -195,7 +198,7 @@ describe(`${__NAME__} addEventListener`, () => {
   });
 
   it("mousedown event should be lasted value", () => {
-    addClickListener("downUp", handler, "all");
+    addClickListener({ type: "downUp", button: "all" }, handler);
 
     const oldMousedownEv = new MouseEvent("mousedown");
     const oldMouseupEv = new MouseEvent("mouseup");
