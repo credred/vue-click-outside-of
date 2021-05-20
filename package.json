@@ -1,6 +1,6 @@
 {
   "name": "vue-click-outside-of",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "Vue 3 directive and hook for detecting click outside an element",
   "author": "credred <cqiufan@outlook.com>",
   "license": "MIT",
