@@ -1,5 +1,17 @@
 <h1 align="center">vue-click-outside-of</h1>
 
+<p align="center">
+  <a href="https://www.npmjs.com/package/vue-click-outside-of">
+    <img src="https://img.shields.io/npm/v/vue-click-outside-of"/>
+  </a>
+  <a href="https://codecov.io/gh/credred/vue-click-outside-of">
+    <img src="https://codecov.io/gh/credred/vue-click-outside-of/branch/main/graph/badge.svg?token=RS2YDY8FUT"/>
+  </a>
+  <a href="https://github.com/credred/vue-click-outside-of/actions/workflows/test.yml">
+    <img src="https://github.com/credred/vue-click-outside-of/actions/workflows/test.yml/badge.svg"/>
+  </a>
+</p>
+
 > Vue 3 监听元素外点击事件的指令和钩子.
 
 [English](https://github.com/credred/vue-click-outside-of/blob/main/README.md) | 简体中文

@@ -1,10 +1,23 @@
 <h1 align="center">vue-click-outside-of</h1>
 
+<p align="center">
+  <a href="https://www.npmjs.com/package/vue-click-outside-of">
+    <img src="https://img.shields.io/npm/v/vue-click-outside-of"/>
+  </a>
+  <a href="https://codecov.io/gh/credred/vue-click-outside-of">
+    <img src="https://codecov.io/gh/credred/vue-click-outside-of/branch/main/graph/badge.svg?token=RS2YDY8FUT"/>
+  </a>
+  <a href="https://github.com/credred/vue-click-outside-of/actions/workflows/test.yml">
+    <img src="https://github.com/credred/vue-click-outside-of/actions/workflows/test.yml/badge.svg"/>
+  </a>
+</p>
+
 > Vue 3 directive and hook for detecting click outside an element.
 
 English | [简体中文](https://github.com/credred/vue-click-outside-of/blob/main/README.zh-CN.md)
 
 ## 🔧Install
+
 ```bash
 $ npm install --save vue-click-outside-of
 or
@@ -12,24 +25,35 @@ $ yarn add vue-click-outside-of
 ```
 
 ## 🎯Options
+
 ### type
+
 Indicates which event should trigger `click outside handler`.
-- downUp - *default value*. It was composed of mousedown event and mouseup event. `click outside handler` will not trigger as long as one of events target is internal element.
+
+- downUp - _default value_. It was composed of mousedown event and mouseup event. `click outside handler` will not trigger as long as one of events target is internal element.
 - click
 - dblclick
+
 ### before
+
 The function will be executed before executing `click outside handler`.
 
 It should return a `boolean` to decide `click outside handler` should be fire or not.
+
 ### exclude
+
 An `element` or An `Array of elements`. The `click outside handler` will not be executed when the `event target` was contained with excluded element.
+
 ### button
+
 Indicates which button was pressed on the mouse to trigger the `click outside handler`. The option not support `dblclick` type.
+
 - "left"
 - "right"
-- "all" -  *default value*.
+- "all" - _default value_.
 
 ## 🚀Usage
+
 ### Directive
 
 ```vue
@@ -113,7 +137,9 @@ export default {
 ```
 
 ## escape hatch for Teleport
+
 Sometimes, you may not know which elements should be excluded when you register `click outside handler`. This is why we provide the `markSibling` method.
+
 ```vue
 <template>
   <div ref="childElementRef">inside element</div>
