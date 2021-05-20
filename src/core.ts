@@ -44,7 +44,7 @@ export interface ClickOutsideOption<T extends keyof EventMap> {
   /**
    * The click outside handler not executed when click target was contained with excluded element.
    *
-   * You can use *middleware* option also to prevent executing click outside handler.
+   * You can use *before* option also to prevent executing click outside handler.
    */
   exclude?: ClickOutsideTarget;
   /**
