@@ -25,6 +25,7 @@ $ yarn add vue-click-outside-of
 
 ## 🚀使用
 ### 指令
+[![Edit vue-click-outside-of-directive](https://codesandbox.io/static/img/play-codesandbox.svg)](https://codesandbox.io/s/vue-click-outside-of-directive-rfbiv?fontsize=14&hidenavigation=1&module=%2Fsrc%2FApp.vue&theme=dark)
 
 ```vue
 <template>
@@ -76,6 +77,7 @@ app.use(VueClickOutsidePlugin).mount("#app");
 ```
 
 ### Hook
+[![Edit vue-click-outside-of-hook](https://codesandbox.io/static/img/play-codesandbox.svg)](https://codesandbox.io/s/vue-click-outside-of-hook-d1w9o?fontsize=14&hidenavigation=1&module=%2Fsrc%2FApp.vue&theme=dark)
 
 ```vue
 <template>
@@ -98,7 +100,7 @@ export default {
 
     onClickOutside((mousedownEv, mouseupEv) => {
       console.log("Clicked outside");
-    }, target);
+    }, target, option);
 
     return { target };
   },
@@ -108,6 +110,9 @@ export default {
 
 ## 🎗️ Teleport 的逃生舱
 有时，你在注册`click outside 回调函数`时可能并不知道你应该排除哪些元素.所以我们提供了`markSibling` 方法.
+
+[![Edit vue-click-outside-of-teleport](https://codesandbox.io/static/img/play-codesandbox.svg)](https://codesandbox.io/s/vue-click-outside-of-teleport-e2myp?fontsize=14&hidenavigation=1&module=%2Fsrc%2FChild.vue&theme=dark)
+
 ```vue
 <template>
   <div ref="childElementRef">inside element</div>

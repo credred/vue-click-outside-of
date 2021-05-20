@@ -27,7 +27,7 @@ $ yarn add vue-click-outside-of
 ## 🚀Usage
 
 ### Directive
-
+[![Edit vue-click-outside-of-directive](https://codesandbox.io/static/img/play-codesandbox.svg)](https://codesandbox.io/s/vue-click-outside-of-directive-rfbiv?fontsize=14&hidenavigation=1&module=%2Fsrc%2FApp.vue&theme=dark)
 ```vue
 <template>
   <div v-click-outside="onClickOutside">target1</div>
@@ -78,7 +78,7 @@ app.use(VueClickOutsidePlugin).mount("#app");
 ```
 
 ### Hook
-
+[![Edit vue-click-outside-of-hook](https://codesandbox.io/static/img/play-codesandbox.svg)](https://codesandbox.io/s/vue-click-outside-of-hook-d1w9o?fontsize=14&hidenavigation=1&module=%2Fsrc%2FApp.vue&theme=dark)
 ```vue
 <template>
   <div ref="target">Inside element</div>
@@ -100,7 +100,7 @@ export default {
 
     onClickOutside((mousedownEv, mouseupEv) => {
       console.log("Clicked outside");
-    }, target);
+    }, target, option);
 
     return { target };
   },
@@ -111,6 +111,8 @@ export default {
 ## 🎗️ escape hatch for Teleport
 
 Sometimes, you may not know which elements should be excluded when you register `click outside handler`. This is why we provide the `markSibling` method.
+
+[![Edit vue-click-outside-of-teleport](https://codesandbox.io/static/img/play-codesandbox.svg)](https://codesandbox.io/s/vue-click-outside-of-teleport-e2myp?fontsize=14&hidenavigation=1&module=%2Fsrc%2FChild.vue&theme=dark)
 
 ```vue
 <template>
