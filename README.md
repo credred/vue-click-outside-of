@@ -24,34 +24,6 @@ or
 $ yarn add vue-click-outside-of
 ```
 
-## 🎯Options
-
-### type
-
-Indicates which event should trigger `click outside handler`.
-
-- downUp - _default value_. It was composed of mousedown event and mouseup event. `click outside handler` will not trigger as long as one of events target is internal element.
-- click
-- dblclick
-
-### before
-
-The function will be executed before executing `click outside handler`.
-
-It should return a `boolean` to decide `click outside handler` should be fire or not.
-
-### exclude
-
-An `element` or An `Array of elements`. The `click outside handler` will not be executed when the `event target` was contained with excluded element.
-
-### button
-
-Indicates which button was pressed on the mouse to trigger the `click outside handler`. The option not support `dblclick` type.
-
-- "left"
-- "right"
-- "all" - _default value_.
-
 ## 🚀Usage
 
 ### Directive
@@ -136,7 +108,7 @@ export default {
 </script>
 ```
 
-## escape hatch for Teleport
+## 🎗️ escape hatch for Teleport
 
 Sometimes, you may not know which elements should be excluded when you register `click outside handler`. This is why we provide the `markSibling` method.
 
@@ -158,7 +130,8 @@ export default {
     const childElementRef = ref();
     const teleportElementRef = ref();
     onMounted(() => {
-      // avoid executing the `click outside handler` which registered on the parent component after the element belonging to `<Teleport>` is clicked.
+      // avoid executing the `click outside handler` which registered
+      // on the parent component after the element belonging to `<Teleport>` is clicked.
       markSibling(teleportElementRef.value, childElementRef.value);
     });
     return {
@@ -196,4 +169,70 @@ export default {
   },
 };
 </script>
+```
+
+## 🎯Options
+```typescript
+export interface ClickOutsideOption<T extends keyof EventMap> {
+  /**
+   * Indicates which event should trigger click outside handler.
+   *
+   * - downUp - *default* value. It was composed of mousedown event and mouseup event.
+   *   click outside handler will not trigger as long as one of events target is internal element.
+   * - click
+   * - dblclick
+   *
+   * @default "all"
+   */
+  type?: T;
+  /**
+   * The click outside handler not executed when click target was contained with excluded element.
+   *
+   * You can use *before* option also to prevent executing click outside handler.
+   */
+  exclude?: ClickOutsideTarget;
+  /**
+   * The function will be executed before executing click outside handler.
+   * it should return a boolean to decide click outside handler should be fire or not.
+   *
+   * You can use *exclude* option also if you want to exclude some element only.
+   */
+  before?: (...args: Parameters<EventMap[T]>) => boolean;
+  /**
+   * indicates which button was pressed on the mouse to trigger the click outside handler.
+   * The option not support `dblclick` type.
+   *
+   * - "left"
+   * - "right"
+   * - "all" -  "default value".
+   *
+   * @default "all"
+   */
+  button?: Button;
+  /**
+   * use capture mode when adding the event listener
+   * @default false
+   */
+  capture?: boolean;
+  /**
+   * @default document.documentElement
+   */
+  background?: HTMLElement | Document | Window | SVGElement;
+}
+
+export interface EventMap {
+  // mousedownEv was undefined if user already pressed mouse before register click outside handler.
+  downUp: (mousedownEv: MouseEvent | undefined, mouseupEv: MouseEvent) => void;
+  click: (ev: MouseEvent) => void;
+  dblclick: (ev: MouseEvent) => void;
+}
+
+type ClickOutsideRawTarget = Element | ComponentPublicInstance;
+
+export type ClickOutsideTarget =
+  | ClickOutsideRawTarget
+  | ClickOutsideRawTarget[]
+  | Ref<ClickOutsideRawTarget | undefined>
+  | Ref<ClickOutsideRawTarget | undefined>[]
+  | ComponentInternalInstance;
 ```
