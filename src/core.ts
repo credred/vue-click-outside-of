@@ -66,6 +66,11 @@ export interface ClickOutsideOption<T extends keyof EventMap> {
    */
   button?: Button;
   /**
+   * use capture mode when adding the event listener
+   * @default false
+   */
+  capture?: boolean;
+  /**
    * @default document.documentElement
    */
   background?: HTMLElement | Document | Window | SVGElement;
@@ -136,6 +141,7 @@ const defaultOption = {
   type: "downUp",
   button: "all",
   background: document.documentElement,
+  capture: false,
 } as const;
 
 export function listenClickOutside<T extends keyof EventMap = "downUp">(
@@ -148,6 +154,7 @@ export function listenClickOutside<T extends keyof EventMap = "downUp">(
     const addClickListenerOption: AddClickListenerOption<T> = {
       type: type as T,
       button: option.button || defaultOption.button,
+      capture: option.capture || defaultOption.capture,
       target: option.background || defaultOption.background,
     };
 
