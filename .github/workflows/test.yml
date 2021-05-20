@@ -1,4 +1,4 @@
-name: Run tests
+name: test
 
 on: [push, pull_request]
 
@@ -13,7 +13,10 @@ jobs:
         with:
           node-version: '14.x'
       - run: yarn --frozen-lockfile
-      - run: yarn test --coverage
+      - name: lint
+        run: yarn lint
+      - name: test
+        run: yarn test --coverage
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v1
         with:
