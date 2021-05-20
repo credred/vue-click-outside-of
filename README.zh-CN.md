@@ -1,5 +1,17 @@
 <h1 align="center">vue-click-outside-of</h1>
 
+<p align="center">
+  <a href="https://www.npmjs.com/package/vue-click-outside-of">
+    <img src="https://img.shields.io/npm/v/vue-click-outside-of"/>
+  </a>
+  <a href="https://codecov.io/gh/credred/vue-click-outside-of">
+    <img src="https://codecov.io/gh/credred/vue-click-outside-of/branch/main/graph/badge.svg?token=RS2YDY8FUT"/>
+  </a>
+  <a href="https://github.com/credred/vue-click-outside-of/actions/workflows/test.yml">
+    <img src="https://github.com/credred/vue-click-outside-of/actions/workflows/test.yml/badge.svg"/>
+  </a>
+</p>
+
 > Vue 3 监听元素外点击事件的指令和钩子.
 
 [English](https://github.com/credred/vue-click-outside-of/blob/main/README.md) | 简体中文
@@ -11,29 +23,9 @@ $ npm install --save vue-click-outside-of
 $ yarn add vue-click-outside-of
 ```
 
-## 🎯选项
-### type
-决定哪个事件应该触发`click outside 回调函数`.
-
-- downUp - *默认值*. 它由`mousedown`事件以及`mouseup`事件组成. 只要有一个事件目标属于内部元素,`click outside 回调函数`就不会被执行.
-- click
-- dblclick
-### before
-这个函数在`click outside 回调函数`被执行前触发.
-
-它应该返回一个`布尔`值去决定`click outside 回调函数`是否应该被执行
-
-### exclude
-一个`element`或一个`element 数组`. 如果这个值包含`事件目标`, `click outside 回调函数`不会被执行.
-### button
-决定鼠标哪个按键应该触发`click outside 回调函数`. 这个选项不支持 "dblclick" 类型.
-
-- "left"
-- "right"
-- "all" -  *默认值*.
-
 ## 🚀使用
 ### 指令
+[![Edit vue-click-outside-of-directive](https://codesandbox.io/static/img/play-codesandbox.svg)](https://codesandbox.io/s/vue-click-outside-of-directive-rfbiv?fontsize=14&hidenavigation=1&module=%2Fsrc%2FApp.vue&theme=dark)
 
 ```vue
 <template>
@@ -85,6 +77,7 @@ app.use(VueClickOutsidePlugin).mount("#app");
 ```
 
 ### Hook
+[![Edit vue-click-outside-of-hook](https://codesandbox.io/static/img/play-codesandbox.svg)](https://codesandbox.io/s/vue-click-outside-of-hook-d1w9o?fontsize=14&hidenavigation=1&module=%2Fsrc%2FApp.vue&theme=dark)
 
 ```vue
 <template>
@@ -107,7 +100,7 @@ export default {
 
     onClickOutside((mousedownEv, mouseupEv) => {
       console.log("Clicked outside");
-    }, target);
+    }, target, option);
 
     return { target };
   },
@@ -117,6 +110,9 @@ export default {
 
 ## 🎗️ Teleport 的逃生舱
 有时，你在注册`click outside 回调函数`时可能并不知道你应该排除哪些元素.所以我们提供了`markSibling` 方法.
+
+[![Edit vue-click-outside-of-teleport](https://codesandbox.io/static/img/play-codesandbox.svg)](https://codesandbox.io/s/vue-click-outside-of-teleport-e2myp?fontsize=14&hidenavigation=1&module=%2Fsrc%2FChild.vue&theme=dark)
+
 ```vue
 <template>
   <div ref="childElementRef">inside element</div>
@@ -173,4 +169,70 @@ export default {
   },
 };
 </script>
+```
+
+## 🎯选项
+```typescript
+export interface ClickOutsideOption<T extends keyof EventMap> {
+  /**
+   * 决定哪个事件应该触发`click outside 回调函数`.
+   *
+   * - downUp - *默认值*. 它由`mousedown`事件以及`mouseup`事件组成. 只要有一个事件目标属于内部元素,`click outside 回调函数`就不会被执行.
+   * - click
+   * - dblclick
+   *
+   * @default "all"
+   */
+  type?: T;
+  /**
+   * 如果这个值包含`事件目标`, `click outside 回调函数`不会被执行.
+   *
+   * 你也可以使用`before`选项去阻止执行`click outside 回调函数`
+   */
+  exclude?: ClickOutsideTarget;
+  /**
+   * 
+   * 这个函数在`click outside 回调函数`被执行前触发.
+   *
+   * 它应该返回一个`布尔`值去决定`click outside 回调函数`是否应该被执行
+   *
+   * 如果你只是想排除一些元素，你也可以使用`exclude`选项
+   */
+  before?: (...args: Parameters<EventMap[T]>) => boolean;
+  /**
+   * 决定鼠标哪个按键应该触发`click outside 回调函数`. 这个选项不支持 "dblclick" 类型.
+   *
+   * - "left"
+   * - "right"
+   * - "all" -  *默认值*.
+   *
+   * @default "all"
+   */
+  button?: Button;
+  /**
+   * 添加事件监听器时使用`捕获(capture)`模式
+   * @default false
+   */
+  capture?: boolean;
+  /**
+   * @default document.documentElement
+   */
+  background?: HTMLElement | Document | Window | SVGElement;
+}
+
+export interface EventMap {
+  // 如果在注册`click outside 回调函数`前，用户已经按下鼠标，那么mousedownEv可能是`undefined`
+  downUp: (mousedownEv: MouseEvent | undefined, mouseupEv: MouseEvent) => void;
+  click: (ev: MouseEvent) => void;
+  dblclick: (ev: MouseEvent) => void;
+}
+
+type ClickOutsideRawTarget = Element | ComponentPublicInstance;
+
+export type ClickOutsideTarget =
+  | ClickOutsideRawTarget
+  | ClickOutsideRawTarget[]
+  | Ref<ClickOutsideRawTarget | undefined>
+  | Ref<ClickOutsideRawTarget | undefined>[]
+  | ComponentInternalInstance;
 ```
