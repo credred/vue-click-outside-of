@@ -47,6 +47,7 @@ describe(`${__NAME__} addEventListener`, () => {
       type: type || "downUp",
       button: option.button || "all",
       target: option.target || document.documentElement,
+      capture: option.capture || false,
     };
   }
 
@@ -61,6 +62,20 @@ describe(`${__NAME__} addEventListener`, () => {
     expect(removeEventListener).toBeCalled();
   });
 
+  it("capture option", () => {
+    const stop = addClickListener(
+      defineOption("click", { capture: true }),
+      handler
+    );
+    expect(addEventListener).toBeCalledWith("click", expect.any(Function), {
+      capture: true,
+    });
+    stop();
+    expect(removeEventListener).toBeCalledWith("click", expect.any(Function), {
+      capture: true,
+    });
+  });
+
   it("invalid type", () => {
     expect(() => {
       // @ts-expect-error test invalid type
@@ -72,17 +87,30 @@ describe(`${__NAME__} addEventListener`, () => {
     const stop = addClickListener(defineOption("downUp"), handler);
 
     expect(addEventListener).toBeCalledTimes(2);
-    expect(addEventListener).toBeCalledWith("mousedown", expect.any(Function));
-    expect(addEventListener).toBeCalledWith("mouseup", expect.any(Function));
+    expect(addEventListener).toBeCalledWith(
+      "mousedown",
+      expect.any(Function),
+      expect.any(Object)
+    );
+    expect(addEventListener).toBeCalledWith(
+      "mouseup",
+      expect.any(Function),
+      expect.any(Object)
+    );
 
     stop();
 
     expect(removeEventListener).toBeCalledTimes(2);
     expect(removeEventListener).toBeCalledWith(
       "mousedown",
-      expect.any(Function)
+      expect.any(Function),
+      expect.any(Object)
     );
-    expect(removeEventListener).toBeCalledWith("mouseup", expect.any(Function));
+    expect(removeEventListener).toBeCalledWith(
+      "mouseup",
+      expect.any(Function),
+      expect.any(Object)
+    );
   });
 
   it("'click' type and 'all' button", () => {
@@ -91,18 +119,28 @@ describe(`${__NAME__} addEventListener`, () => {
     expect(addEventListener).toBeCalledTimes(2);
     expect(addEventListener).toBeCalledWith(
       "contextmenu",
-      expect.any(Function)
+      expect.any(Function),
+      expect.any(Object)
     );
-    expect(addEventListener).toBeCalledWith("click", expect.any(Function));
+    expect(addEventListener).toBeCalledWith(
+      "click",
+      expect.any(Function),
+      expect.any(Object)
+    );
 
     stop();
 
     expect(removeEventListener).toBeCalledTimes(2);
     expect(removeEventListener).toBeCalledWith(
       "contextmenu",
-      expect.any(Function)
+      expect.any(Function),
+      expect.any(Object)
     );
-    expect(removeEventListener).toBeCalledWith("click", expect.any(Function));
+    expect(removeEventListener).toBeCalledWith(
+      "click",
+      expect.any(Function),
+      expect.any(Object)
+    );
   });
 
   it("'click' type and 'left' button", () => {
@@ -112,12 +150,20 @@ describe(`${__NAME__} addEventListener`, () => {
     );
 
     expect(addEventListener).toBeCalledTimes(1);
-    expect(addEventListener).toBeCalledWith("click", expect.any(Function));
+    expect(addEventListener).toBeCalledWith(
+      "click",
+      expect.any(Function),
+      expect.any(Object)
+    );
 
     stop();
 
     expect(removeEventListener).toBeCalledTimes(1);
-    expect(removeEventListener).toBeCalledWith("click", expect.any(Function));
+    expect(removeEventListener).toBeCalledWith(
+      "click",
+      expect.any(Function),
+      expect.any(Object)
+    );
   });
 
   it("'click' type and 'right' button", () => {
@@ -129,7 +175,8 @@ describe(`${__NAME__} addEventListener`, () => {
     expect(addEventListener).toBeCalledTimes(1);
     expect(addEventListener).toBeCalledWith(
       "contextmenu",
-      expect.any(Function)
+      expect.any(Function),
+      expect.any(Object)
     );
 
     stop();
@@ -137,7 +184,8 @@ describe(`${__NAME__} addEventListener`, () => {
     expect(removeEventListener).toBeCalledTimes(1);
     expect(removeEventListener).toBeCalledWith(
       "contextmenu",
-      expect.any(Function)
+      expect.any(Function),
+      expect.any(Object)
     );
   });
 
@@ -148,14 +196,19 @@ describe(`${__NAME__} addEventListener`, () => {
     );
 
     expect(addEventListener).toBeCalledTimes(1);
-    expect(addEventListener).toBeCalledWith("dblclick", expect.any(Function));
+    expect(addEventListener).toBeCalledWith(
+      "dblclick",
+      expect.any(Function),
+      expect.any(Object)
+    );
 
     stop();
 
     expect(removeEventListener).toBeCalledTimes(1);
     expect(removeEventListener).toBeCalledWith(
       "dblclick",
-      expect.any(Function)
+      expect.any(Function),
+      expect.any(Object)
     );
   });
 
