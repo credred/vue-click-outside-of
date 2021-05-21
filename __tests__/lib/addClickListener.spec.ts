@@ -53,9 +53,8 @@ describe(`${__NAME__} addEventListener`, () => {
 
   it("should add/remove event listener on target element", () => {
     const target = document.createElement("div");
-    const { addEventListener, removeEventListener } = createEventListener(
-      target
-    );
+    const { addEventListener, removeEventListener } =
+      createEventListener(target);
     const stop = addClickListener(defineOption("downUp", { target }), handler);
     expect(addEventListener).toBeCalled();
     stop();

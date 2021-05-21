@@ -11,9 +11,8 @@ export interface VClickOutsideObjectValue<K extends keyof EventMap>
   handler: ClickOutsideHandler<K>;
 }
 
-export type VClickOutsideFunctionValue<
-  K extends keyof EventMap
-> = ClickOutsideOption<K> & ClickOutsideHandler<K>;
+export type VClickOutsideFunctionValue<K extends keyof EventMap> =
+  ClickOutsideOption<K> & ClickOutsideHandler<K>;
 
 export type VClickOutsideValue<K extends keyof EventMap> =
   | VClickOutsideObjectValue<K>
