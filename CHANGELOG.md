@@ -1,5 +1,14 @@
 ## Changelog
 
+### 1.0.3
+
+*2021-05-21*
+
+#### Optimization
+
+- Chore
+  - Change build target from esnext to es6
+
 ### 1.0.2
 
 *2021-05-20*
