@@ -56,18 +56,13 @@ const removeClickListenerMap = new WeakMap<Element, () => void>();
 function startListen(el: Element, value: VClickOutsideValue<keyof EventMap>) {
   if (
     !value ||
-    (typeof value !== "function" &&
-      typeof (value as VClickOutsideObjectValue<keyof EventMap>).handler !==
-        "function")
+    (typeof value !== "function" && typeof value.handler !== "function")
   ) {
     throw new TypeError(
       "click-outside: Binding to the directive value must be a function or an object with handler method"
     );
   }
-  const cb =
-    typeof value === "function"
-      ? value
-      : (value as VClickOutsideObjectValue<keyof EventMap>).handler;
+  const cb = typeof value === "function" ? value : value.handler;
 
   const stopClickOutsideListener = listenClickOutside(el, cb, value);
   removeClickListenerMap.set(el, stopClickOutsideListener);

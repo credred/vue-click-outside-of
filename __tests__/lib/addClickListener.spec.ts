@@ -30,12 +30,8 @@ const handler = jest.fn();
 
 afterEach(() => {
   handler.mockClear();
-  // addEventListener mockImplementation register function which execute clearAfter method.
-  // so removeEventListener.mockClear method execution should follow behind.
-  clearAfter(() => {
-    addEventListener.mockClear();
-    removeEventListener.mockClear();
-  });
+  addEventListener.mockClear();
+  removeEventListener.mockClear();
 });
 
 describe(`${__NAME__} addEventListener`, () => {
