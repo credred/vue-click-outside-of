@@ -18,14 +18,16 @@ import {
   EventMap,
 } from "./lib/addClickListener";
 
-type ClickOutsideRawTarget = Element | ComponentPublicInstance;
+type ClickOutsideRawTarget =
+  | Element
+  | ComponentPublicInstance
+  | ComponentInternalInstance;
 
 export type ClickOutsideTarget =
   | ClickOutsideRawTarget
   | ClickOutsideRawTarget[]
   | Ref<ClickOutsideRawTarget | undefined>
-  | Ref<ClickOutsideRawTarget | undefined>[]
-  | ComponentInternalInstance;
+  | Ref<ClickOutsideRawTarget | undefined>[];
 
 export type ClickOutsideHandler<T extends keyof EventMap> = EventMap[T];
 
@@ -85,26 +87,27 @@ export function defineClickOutsideOption<T extends keyof EventMap = "downUp">(
   return option;
 }
 
-type ArrayItem<T extends Array<unknown>> = T extends Array<infer R> ? R : never;
 function getRealTarget(target: ClickOutsideTarget): Element[] {
   let newTarget = Array.isArray(target)
-    ? // the reason of using ArrayItem genetic:  typescript can't recognize 't' type
-      target.map((t: ArrayItem<typeof target>) => unref(t))
+    ? target.map((t) => unref(t))
     : unref(target);
 
   if (newTarget === undefined) {
     return [];
-  } else if (isComponentInternalInstance(newTarget)) {
-    const realTarget = getRealTargetFromVNode(newTarget.subTree);
-    return Array.isArray(realTarget) ? realTarget : [realTarget];
   }
   if (!Array.isArray(newTarget)) {
     newTarget = [newTarget];
   }
   return filterUndef(newTarget)
-    .map((t) =>
-      isComponentPublicInstance(t) ? getRealTargetFromVNode(t.$.subTree) : t
-    )
+    .map((t) => {
+      if (isComponentInternalInstance(t)) {
+        return getRealTargetFromVNode(t.subTree);
+      } else if (isComponentPublicInstance(t)) {
+        return getRealTargetFromVNode(t.$.subTree);
+      } else {
+        return t;
+      }
+    })
     .flat();
 }
 

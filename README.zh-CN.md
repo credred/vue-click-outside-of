@@ -227,12 +227,14 @@ export interface EventMap {
   dblclick: (ev: MouseEvent) => void;
 }
 
-type ClickOutsideRawTarget = Element | ComponentPublicInstance;
+type ClickOutsideRawTarget =
+  | Element
+  | ComponentPublicInstance
+  | ComponentInternalInstance;
 
 export type ClickOutsideTarget =
   | ClickOutsideRawTarget
   | ClickOutsideRawTarget[]
   | Ref<ClickOutsideRawTarget | undefined>
-  | Ref<ClickOutsideRawTarget | undefined>[]
-  | ComponentInternalInstance;
+  | Ref<ClickOutsideRawTarget | undefined>[];
 ```
