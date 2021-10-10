@@ -1,5 +1,12 @@
 ## Changelog
 
+### 1.0.4
+*2021-10-10*
+
+#### Features
+
+- simplify the ClickOutsideTarget type
+
 ### 1.0.3
 
 *2021-05-21*
