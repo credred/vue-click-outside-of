@@ -10,6 +10,9 @@
   <a href="https://github.com/credred/vue-click-outside-of/actions/workflows/test.yml">
     <img src="https://github.com/credred/vue-click-outside-of/actions/workflows/test.yml/badge.svg"/>
   </a>
+  <a href="https://bundlephobia.com/result?p=vue-click-outside-of">
+    <img src="https://img.shields.io/bundlephobia/minzip/vue-click-outside-of"/>
+  </a>
 </p>
 
 > Vue 3 directive and hook for detecting click outside an element.
