@@ -12,7 +12,7 @@ const config = {
       file: "dist/vue-click-outside-of.umd.js",
       format: "umd",
       exports: "named",
-      sourcemap: true,
+      sourcemap: false,
       globals: {
         vue: "Vue",
       },
@@ -21,7 +21,7 @@ const config = {
       name: packageJSON.name,
       file: "dist/vue-click-outside-of.es.js",
       format: "es",
-      sourcemap: true,
+      sourcemap: false,
     },
   ],
   plugins: [
